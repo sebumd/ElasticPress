@@ -403,7 +403,11 @@ if ( epas.endpointUrl && '' !== epas.endpointUrl ) {
 			const searchText = $localInput.val();
 			const placeholder = 'ep_autosuggest_placeholder';
 			const queryJSON = getJsonQuery();
+			const postType = $localInput.closest( 'form' ).find( '[name="post_type"]' ).val();
 
+			if( queryJSON.error ) {
+				return;
+			}
 			if( queryJSON.error ) {
 				return;
 			}
@@ -417,6 +421,20 @@ if ( epas.endpointUrl && '' !== epas.endpointUrl ) {
 
 			if ( 2 <= searchText.length ) {
 				query = buildSearchQuery( searchText, placeholder, queryJSON );
+
+				if ( 'undefined' !== typeof postType ) {
+					query = JSON.parse( query );
+					query.post_filter.bool.must.push( {
+						terms: {
+							'post_type.raw': [
+								postType
+							]
+						}
+					} );
+
+					query = JSON.stringify( query );
+				}
+
 				request = esSearch( query, searchText );
 
 				request.done( ( response ) => {
