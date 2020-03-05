@@ -408,9 +408,6 @@ if ( epas.endpointUrl && '' !== epas.endpointUrl ) {
 			if( queryJSON.error ) {
 				return;
 			}
-			if( queryJSON.error ) {
-				return;
-			}
 
 			let query;
 			let request;
@@ -424,13 +421,16 @@ if ( epas.endpointUrl && '' !== epas.endpointUrl ) {
 
 				if ( 'undefined' !== typeof postType ) {
 					query = JSON.parse( query );
-					query.post_filter.bool.must.push( {
-						terms: {
-							'post_type.raw': [
-								postType
-							]
-						}
-					} );
+
+					if ( 'undefined' !== typeof query.post_filter.bool.must ) {
+						query.post_filter.bool.must.push( {
+							terms: {
+								'post_type.raw': [
+									postType
+								]
+							}
+						} );
+					}
 
 					query = JSON.stringify( query );
 				}
